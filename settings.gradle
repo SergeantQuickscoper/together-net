@@ -19,6 +19,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "TogetherNet"
-include(":app")
- 
+rootProject.name = "togetherNet"
+include ':app'
