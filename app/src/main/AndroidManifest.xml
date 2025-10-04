@@ -13,6 +13,30 @@
         android:theme="@style/Theme.TogetherNet"
         tools:targetApi="31">
         <activity
+            android:name=".SettingsActivity"
+            android:exported="false" />
+        <activity
+            android:name=".MessageLogActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ChatActivity"
+            android:exported="false" />
+        <activity
+            android:name=".SearchNodesActivity"
+            android:exported="false" />
+        <activity
+            android:name=".NetworkDisconnectedActivity"
+            android:exported="false" />
+        <activity
+            android:name=".NetworkConnectedActivity"
+            android:exported="false" />
+        <activity
+            android:name=".UserCreationActivity"
+            android:exported="false" />
+        <activity
+            android:name=".PermissionsActivity"
+            android:exported="false" />
+        <activity
             android:name=".MainActivity"
             android:exported="true">
             <intent-filter>
