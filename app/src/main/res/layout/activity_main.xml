@@ -12,7 +12,7 @@
         android:id="@+id/textView2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:fontFamily="@font/PetMe128"
+        android:fontFamily="@font/pet"
         android:text="TogetherNet"
         android:textColor="#49FF40"
         android:textSize="34sp"
@@ -28,11 +28,12 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="4dp"
         android:layout_marginTop="16dp"
-        android:fontFamily="@font/PetMe128"
+        android:fontFamily="@font/pet"
         android:text="A private communication network"
         android:textColor="#FFFFFF"
         android:textSize="12sp"
-        app:layout_constraintStart_toStartOf="@+id/textView2"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView2" />
 
     <Button
@@ -42,7 +43,7 @@
         android:layout_marginTop="48dp"
         android:background="@drawable/button_background"
         android:backgroundTint="@null"
-        android:fontFamily="@font/MSXScreen0"
+        android:fontFamily="@font/msx"
         android:gravity="center"
         android:stateListAnimator="@null"
         android:text="Join"
@@ -62,10 +63,10 @@
         android:id="@+id/imageView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="32dp"
         android:layout_marginBottom="76dp"
         app:layout_constraintBottom_toTopOf="@+id/textView2"
         app:layout_constraintEnd_toEndOf="parent"
-        app:srcCompat="@drawable/splashImage" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:srcCompat="@drawable/splash_image" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

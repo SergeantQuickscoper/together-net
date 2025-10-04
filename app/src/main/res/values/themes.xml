@@ -1,9 +1,4 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
-    <style name="Theme.PROJECTNAME" parent="Theme.AppCompat.Light.NoActionBar">
-        <!-- Customize your light theme here. -->
-        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
-    </style>
-
-    <style name="Theme.TogetherNet" parent="Base.Theme.TogetherNet" />
+    <style name="Theme.TogetherNet" parent="Theme.AppCompat.Light.NoActionBar" />
 </resources>
