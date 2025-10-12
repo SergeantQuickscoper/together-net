@@ -9,13 +9,13 @@
     tools:context=".MainActivity">
 
     <Button
-        android:id="@+id/button6"
+        android:id="@+id/CreateNickNameButton"
         android:layout_width="201dp"
         android:layout_height="43dp"
         android:layout_marginTop="16dp"
         android:background="@drawable/button_background"
         android:backgroundTint="@null"
-        android:fontFamily="@font/msx"
+        android:fontFamily="@font/msxscreen01"
         android:gravity="center"
         android:stateListAnimator="@null"
         android:text="Continue"
@@ -29,7 +29,7 @@
         app:iconTint="@color/design_default_color_primary"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/button5" />
+        app:layout_constraintTop_toBottomOf="@+id/LocationPerms" />
 
     <TextView
         android:id="@+id/textView3"
@@ -64,14 +64,14 @@
         app:layout_constraintTop_toBottomOf="@+id/textView2" />
 
     <Button
-        android:id="@+id/button3"
+        android:id="@+id/WIFIperms"
         android:layout_width="158dp"
         android:layout_height="36dp"
         android:layout_marginStart="16dp"
         android:layout_marginTop="304dp"
         android:background="@drawable/button_background"
         android:backgroundTint="@null"
-        android:fontFamily="@font/msx"
+        android:fontFamily="@font/msxscreen01"
         android:gravity="center"
         android:stateListAnimator="@null"
         android:text="Acknowledge"
@@ -102,14 +102,14 @@
         app:layout_constraintTop_toBottomOf="@+id/textView2" />
 
     <Button
-        android:id="@+id/button4"
+        android:id="@+id/ForegroundPerms"
         android:layout_width="158dp"
         android:layout_height="36dp"
         android:layout_marginStart="16dp"
         android:layout_marginTop="440dp"
         android:background="@drawable/button_background"
         android:backgroundTint="@null"
-        android:fontFamily="@font/msx"
+        android:fontFamily="@font/msxscreen01"
         android:gravity="center"
         android:stateListAnimator="@null"
         android:text="Acknowledge"
@@ -140,14 +140,14 @@
         app:layout_constraintTop_toBottomOf="@+id/textView2" />
 
     <Button
-        android:id="@+id/button5"
+        android:id="@+id/LocationPerms"
         android:layout_width="158dp"
         android:layout_height="36dp"
         android:layout_marginStart="12dp"
         android:layout_marginTop="580dp"
         android:background="@drawable/button_background"
         android:backgroundTint="@null"
-        android:fontFamily="@font/msx"
+        android:fontFamily="@font/msxscreen01"
         android:gravity="center"
         android:stateListAnimator="@null"
         android:text="Acknowledge"
@@ -162,14 +162,14 @@
         app:layout_constraintTop_toBottomOf="@+id/textView2" />
 
     <Button
-        android:id="@+id/button2"
+        android:id="@+id/BTperms"
         android:layout_width="158dp"
         android:layout_height="36dp"
         android:layout_marginStart="16dp"
         android:layout_marginTop="176dp"
         android:background="@drawable/button_background"
         android:backgroundTint="@null"
-        android:fontFamily="@font/msx"
+        android:fontFamily="@font/msxscreen01"
         android:gravity="center"
         android:stateListAnimator="@null"
         android:text="Acknowledge"
