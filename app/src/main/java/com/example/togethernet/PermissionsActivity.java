@@ -87,7 +87,7 @@ public class PermissionsActivity extends AppCompatActivity {
         });
         wifiPermsBtn.setOnClickListener(new View.OnClickListener(){
             @Override
-            public void onClick(View v) {
+            public void onClick(View v){
                 // TODO: Handle WiFi permissions
             }
         });
