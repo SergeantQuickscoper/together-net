@@ -16,7 +16,7 @@ public class NodeDAO{
     }
 
 
-    // Add new node to DB. ensure  it should just be called only once when user registers their node
+    // Add new node to DB. ensure it should just be called only once when user registers their node
     public long insertNode(Nodes node){
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         ContentValues values = new ContentValues();
@@ -26,7 +26,7 @@ public class NodeDAO{
         return id;
     }
 
-    // TODO: maybe add a method to allow updating the node id
+    // TODO: maybe add a method to allow updating the node id (low priority)
 
     // get a node or null if doesnt exist
     public Nodes getNode(){
