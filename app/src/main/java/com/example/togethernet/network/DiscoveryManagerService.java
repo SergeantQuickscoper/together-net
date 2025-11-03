@@ -1,5 +1,7 @@
 package com.example.togethernet.network;
 
+import com.example.togethernet.database.dao.NodeDAO;
+import com.example.togethernet.database.model.Nodes;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -23,6 +25,10 @@ import android.os.ParcelUuid;
 import android.util.Log;
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
+
+import org.w3c.dom.Node;
+
+import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.UUID;
 import java.util.HashSet;
@@ -102,9 +108,15 @@ public class DiscoveryManagerService extends Service {
                 .setTxPowerLevel(AdvertiseSettings.ADVERTISE_TX_POWER_MEDIUM)
                 .setConnectable(false)
                 .build();
-        // TODO: add Node ID to this payload
+
+        NodeDAO dao = new NodeDAO(this);
+        Nodes thisNode = dao.getNode();
+        String nodeID = thisNode.getNodeId();
+        byte[] nodeIDbytes = nodeID.getBytes(StandardCharsets.UTF_8);
+        UUID serviceUuid = UUID.fromString(TOGETHER_NET_UUID);
         AdvertiseData data = new AdvertiseData.Builder()
-                .addServiceUuid(new ParcelUuid(UUID.fromString(TOGETHER_NET_UUID)))
+                .addServiceUuid(new ParcelUuid(serviceUuid))
+                .addServiceData(new ParcelUuid(serviceUuid), nodeIDbytes)
                 .setIncludeDeviceName(false)
                 .build();
 
@@ -152,11 +164,21 @@ public class DiscoveryManagerService extends Service {
         @Override
         public void onScanResult(int callbackType, ScanResult result) {
             String mac = result.getDevice().getAddress();
+            byte[] serviceData;
+            try{
+                serviceData = result.getScanRecord().getServiceData(new ParcelUuid(UUID.fromString(TOGETHER_NET_UUID)));
+            }
+            catch(NullPointerException e){
+                Log.e(TAG, "Null service data");
+                return;
+            }
+
+            String nodeId = new String(serviceData, StandardCharsets.UTF_8);
 
             if (!discoveredDevices.contains(mac)){
                 discoveredDevices.add(mac);
                 totalDiscoveredNodes = discoveredDevices.size();
-                Log.i(TAG, "New device discovered: " + mac);
+                Log.i(TAG, "New device discovered: " + nodeId);
             }
         }
     };
