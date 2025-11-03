@@ -36,7 +36,7 @@ import java.util.HashSet;
 public class DiscoveryManagerService extends Service {
     // channel settings
     private static final String TAG = "BLEService";
-    private static final String TOGETHER_NET_UUID = "b5f5c630-60e1-4fd7-9c92-c8db13a2f090"; // hard coded uuid for the app service
+    private static final String TOGETHER_NET_UUID = "0000FFF0-0000-1000-8000-00805F9B34FB"; // 2 byte special uuid format hard coded uuid for the app service
     private static final String CHANNEL_ID = "TogetherNetBLE";
     private static final int SCAN_DURATION_MS = 5000;  // scan for 4 seconds
     private static final int SCAN_PAUSE_MS = 2000; // wait for 6 seconds
