@@ -22,7 +22,9 @@ public class PermissionsActivity extends AppCompatActivity {
     Button fgPermsBtn;
     Button createNickNameBtn;
     private static final int REQUEST_BLUETOOTH_PERMISSIONS = 1;
-
+    private static final int REQUEST_FOREGROUND_SERVICE_PERMISSIONS = 2;
+    private static boolean btpermsGranted = false;
+    private static boolean foregroundPermsGranted = false;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -50,7 +52,9 @@ public class PermissionsActivity extends AppCompatActivity {
                     btPermissions = new String[]{
                             Manifest.permission.BLUETOOTH_SCAN,
                             Manifest.permission.BLUETOOTH_CONNECT,
-                            Manifest.permission.BLUETOOTH_ADVERTISE
+                            Manifest.permission.BLUETOOTH_ADVERTISE,
+                            Manifest.permission.ACCESS_FINE_LOCATION,
+                            Manifest.permission.FOREGROUND_SERVICE_LOCATION
                     };
                 }
                 else{
@@ -94,15 +98,51 @@ public class PermissionsActivity extends AppCompatActivity {
 
         fgPermsBtn.setOnClickListener(new View.OnClickListener(){
             @Override
-            public void onClick(View v) {
-                // TODO: Handle Foreground permissions
+            public void onClick(View v){
+                String[] fgPermissions;
+
+                // target perms
+                if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.S){
+                    fgPermissions = new String[]{
+                            Manifest.permission.FOREGROUND_SERVICE,
+                            Manifest.permission.FOREGROUND_SERVICE_LOCATION,
+                            Manifest.permission.FOREGROUND_SERVICE_CONNECTED_DEVICE,
+                            Manifest.permission.FOREGROUND_SERVICE_DATA_SYNC
+                    };
+                }
+                else{
+                    // No foreground-service-type permission before API 31
+                    fgPermissions = new String[]{
+                            Manifest.permission.FOREGROUND_SERVICE // technically min is still 28 worry about this later
+                    };
+                }
+
+                boolean allGranted = true;
+                for (String perm : fgPermissions){
+                    if (ContextCompat.checkSelfPermission(PermissionsActivity.this, perm)
+                            != PackageManager.PERMISSION_GRANTED) {
+                        allGranted = false;
+                        break;
+                    }
+                }
+
+                if (!allGranted){
+                    ActivityCompat.requestPermissions(
+                            PermissionsActivity.this,
+                            fgPermissions,
+                            REQUEST_FOREGROUND_SERVICE_PERMISSIONS
+                    );
+                }
+                else{
+                    Toast.makeText(PermissionsActivity.this,"Foreground service permissions already granted", Toast.LENGTH_SHORT).show();
+                }
             }
         });
 
         createNickNameBtn.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v){
-                // TODO: Add check here later for permissions
+                // TODO: Add check here later for permissions (loop thru all perms add after wifi perms ig)
                 Intent switchToNickName = new Intent(PermissionsActivity.this, UserCreationActivity.class);
                 startActivity(switchToNickName);
             }

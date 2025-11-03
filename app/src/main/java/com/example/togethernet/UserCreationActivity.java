@@ -1,6 +1,7 @@
 package com.example.togethernet;
 
 
+import android.content.Intent;
 import android.os.Bundle;
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -12,6 +13,7 @@ import com.google.android.material.textfield.TextInputEditText;
 import android.provider.Settings;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.TextView;
 import java.security.MessageDigest;
@@ -25,6 +27,15 @@ public class UserCreationActivity extends AppCompatActivity {
         // TEMPORARY quick and dirty check
         NodeDAO nodeDB = new NodeDAO(this);
         Nodes node = nodeDB.getNode();
+        if(node == null){
+            Log.d("NODE TAG:", "NULL");
+        }
+        else{
+            Log.d("NODE TAG:", node.getNodeId());
+            Intent switchToNetwork = new Intent(UserCreationActivity.this, NetworkScreenActivity.class);
+            startActivity(switchToNetwork);
+        }
+
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_user_creation);
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
@@ -61,32 +72,36 @@ public class UserCreationActivity extends AppCompatActivity {
             public void afterTextChanged(Editable s) {}
         });
 
-        // On continue click
         continueButton.setOnClickListener(v -> {
             String nickname = nicknameInput.getText() != null ? nicknameInput.getText().toString().trim() : "";
             String nodeId = nodeIdView.getText().toString();
 
-            if(nickname.isEmpty()){
+            if(nickname.isEmpty() || nickname.equals("N/A")){
                 nicknameInput.setError("Nickname required");
                 return;
             }
 
-            System.out.println("Node ID: " + nodeId);
+            Nodes userNode = new Nodes(nodeId);
+            nodeDB.insertNode(userNode);
 
-            // TODO: transfer to network discovery activity here asw
+            Intent switchToNetwork = new Intent(UserCreationActivity.this, NetworkScreenActivity.class);
+            startActivity(switchToNetwork);
+
+            finish();
         });
     }
 
     //unique Node ID using SHA-256 hash of Android ID + nickname
     private String generateNodeId(String androidId, String nickname){
         try {
+            // TODO: maybe redo this to be shorter as limitations with advertising exist
             String input = androidId + "_" + nickname;
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
             byte[] hash = digest.digest(input.getBytes());
 
             // first few bytes to hex for compact readable ID
             StringBuilder hex = new StringBuilder();
-            for(int i = 0; i < 6; i++){ // shorter 12-char ID
+            for(int i = 0; i < 6; i++){
                 hex.append(String.format("%02x", hash[i]));
             }
             return nickname + "@" + hex.toString().toUpperCase();

@@ -13,6 +13,7 @@
     <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
     <uses-permission android:name="android.permission.NEARBY_WIFI_DEVICES" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_LOCATION" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_CONNECTED_DEVICE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
 
@@ -37,7 +38,7 @@
         android:theme="@style/Theme.TogetherNet"
         tools:targetApi="31">
         <activity
-            android:name=".NetworkScreen"
+            android:name=".NetworkScreenActivity"
             android:exported="false" />
         <activity
             android:name=".SettingsActivity"
@@ -66,6 +67,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <service android:name=".network.DiscoveryManagerService"
+            android:exported="false"
+            android:foregroundServiceType="location|dataSync|connectedDevice" />
     </application>
 
 </manifest>
