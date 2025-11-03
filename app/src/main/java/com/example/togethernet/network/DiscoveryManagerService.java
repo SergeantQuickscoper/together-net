@@ -30,10 +30,18 @@ import java.util.HashSet;
 public class DiscoveryManagerService extends Service {
     // channel settings
     private static final String TAG = "BLEService";
-    private static final String TOGETHER_NET_UUID = "646f6e20-7275-6c65-7300-000000000000"; // hard coded uuid for the app service
+    private static final String TOGETHER_NET_UUID = "b5f5c630-60e1-4fd7-9c92-c8db13a2f090"; // hard coded uuid for the app service
     private static final String CHANNEL_ID = "TogetherNetBLE";
-    private static final int SCAN_DURATION_MS = 4000;  // scan for 4 seconds
-    private static final int SCAN_PAUSE_MS = 6000; // wait for 6 seconds
+    private static final int SCAN_DURATION_MS = 5000;  // scan for 4 seconds
+    private static final int SCAN_PAUSE_MS = 2000; // wait for 6 seconds
+    //TODO: add params for advertisor too
+
+
+
+
+
+
+
     private final android.os.Handler scanHandler = new android.os.Handler();
     private boolean isScanning = false;
 

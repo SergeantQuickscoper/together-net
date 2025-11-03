@@ -19,6 +19,8 @@ public class NetworkScreenActivity extends AppCompatActivity {
     Button btnSendMessage;
     TextView statusText;
     TextView count;
+    private final android.os.Handler uiHandler = new android.os.Handler();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -43,7 +45,28 @@ public class NetworkScreenActivity extends AppCompatActivity {
                 startActivity(switchToNodeSearch);
             }
         });
-
-
     }
+
+    protected void onStart(){
+        super.onStart();
+        uiHandler.post(uiUpdater);
+    }
+
+    protected void onStop() {
+        super.onStop();
+        uiHandler.removeCallbacks(uiUpdater);
+    }
+
+    private final Runnable uiUpdater = new Runnable(){
+        @Override
+        public void run() {
+            // disgusting TODO: fix this later
+            int countValue = DiscoveryManagerService.totalDiscoveredNodes;
+
+            count.setText(String.valueOf(countValue));
+            uiHandler.postDelayed(this, 500);
+        }
+    };
+
+
 }
