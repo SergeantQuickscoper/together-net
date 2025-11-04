@@ -32,6 +32,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.UUID;
 import java.util.HashSet;
+
+
 // MAJOR TODO: actually add a check to see if bluetooth is on on the device (probably in the try block)
 public class DiscoveryManagerService extends Service {
     // channel settings
@@ -42,22 +44,15 @@ public class DiscoveryManagerService extends Service {
     private static final int SCAN_PAUSE_MS = 2000; // wait for 6 seconds
     //TODO: add params for advertisor too
 
-
-
-
-
-
-
     private final android.os.Handler scanHandler = new android.os.Handler();
     private boolean isScanning = false;
 
-    public static final HashSet<String> discoveredDevices = new HashSet<>(); // rn use mac address but move to nodeID once thats part of payload
     private BluetoothLeAdvertiser advertiser = null;
     private BluetoothLeScanner scanner = null;
 
     // network stats (GOING STATIC VARS for now, in the future look into Binding/Broadcasting)
     public static int totalDiscoveredNodes = 0;
-
+    public static final HashSet<DiscoveredDevice> discoveredDevices = new HashSet<>();
     private final Runnable scanPulse = new Runnable(){
         @Override
         public void run(){
@@ -160,6 +155,13 @@ public class DiscoveryManagerService extends Service {
         }
     }
 
+    private boolean containsMac(String mac){
+        for(DiscoveredDevice d : discoveredDevices){
+            if(d.getMac().equals(mac)) return true;
+        }
+        return false;
+    }
+
     private final ScanCallback scanCallback = new ScanCallback() {
         @Override
         public void onScanResult(int callbackType, ScanResult result) {
@@ -175,8 +177,8 @@ public class DiscoveryManagerService extends Service {
 
             String nodeId = new String(serviceData, StandardCharsets.UTF_8);
 
-            if (!discoveredDevices.contains(mac)){
-                discoveredDevices.add(mac);
+            if (!containsMac(mac)){
+                discoveredDevices.add(new DiscoveredDevice(mac, nodeId));
                 totalDiscoveredNodes = discoveredDevices.size();
                 Log.i(TAG, "New device discovered: " + nodeId);
             }
@@ -184,7 +186,7 @@ public class DiscoveryManagerService extends Service {
     };
 
     @Override
-    public void onDestroy() {
+    public void onDestroy(){
         super.onDestroy();
         try{
             if(advertiser != null) advertiser.stopAdvertising(advertiseCallback);

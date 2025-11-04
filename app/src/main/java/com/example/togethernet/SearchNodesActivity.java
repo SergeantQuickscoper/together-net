@@ -1,24 +1,114 @@
 package com.example.togethernet;
 
+import android.graphics.Typeface;
 import android.os.Bundle;
-
-import androidx.activity.EdgeToEdge;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.TextView;
+import com.example.togethernet.network.DiscoveryManagerService;
+import com.example.togethernet.network.DiscoveredDevice;
+import java.util.ArrayList;
+import java.util.List;
+import androidx.core.content.res.ResourcesCompat;
+import android.widget.EditText;
+import android.text.Editable;
+import android.text.TextWatcher;
 
 public class SearchNodesActivity extends AppCompatActivity {
+    private RecyclerView recyclerView;
+    private NodeIdAdapter adapter;
+    private EditText searchBox;
+    private List<DiscoveredDevice> allDevices;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
-        EdgeToEdge.enable(this);
         setContentView(R.layout.activity_search_nodes);
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
-            return insets;
+        recyclerView = findViewById(R.id.discoveredList);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        allDevices = new ArrayList<>(DiscoveryManagerService.discoveredDevices);
+        adapter = new NodeIdAdapter(allDevices);
+        recyclerView.setAdapter(adapter);
+
+        searchBox = findViewById(R.id.searchBox);
+        searchBox.addTextChangedListener(new TextWatcher(){
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after){}
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count){
+                filter(s.toString());
+            }
+            @Override
+            public void afterTextChanged(Editable s){}
         });
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        allDevices = new ArrayList<>(DiscoveryManagerService.discoveredDevices);
+        filter(searchBox.getText().toString());
+    }
+
+    private void filter(String text){
+        List<DiscoveredDevice> filtered = new ArrayList<>();
+        for(DiscoveredDevice device : allDevices){
+            if(device.getNodeID().toLowerCase().contains(text.toLowerCase())){
+                filtered.add(device);
+            }
+        }
+        adapter.setDevices(filtered);
+    }
+
+    static class NodeIdAdapter extends RecyclerView.Adapter<NodeIdAdapter.NodeIdViewHolder>{
+        private List<DiscoveredDevice> devices;
+        private Typeface petFont;
+        private static final int PET_BLUE = 0xFF2C1DFF; // my blue
+
+        NodeIdAdapter(List<DiscoveredDevice> devices){
+            this.devices = devices;
+        }
+
+        public void setDevices(List<DiscoveredDevice> devices){
+            this.devices = devices;
+            notifyDataSetChanged();
+        }
+        @NonNull
+        @Override
+        public NodeIdViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType){
+            View view = LayoutInflater.from(parent.getContext()).inflate(android.R.layout.simple_list_item_1, parent, false);
+            if (petFont == null){
+                petFont = ResourcesCompat.getFont(parent.getContext(), R.font.pet);
+            }
+            return new NodeIdViewHolder(view, petFont);
+        }
+        @Override
+        public void onBindViewHolder(@NonNull NodeIdViewHolder holder, int position){
+            holder.bind(devices.get(position));
+        }
+        @Override
+        public int getItemCount(){
+            return devices.size();
+        }
+        static class NodeIdViewHolder extends RecyclerView.ViewHolder{
+            private final TextView textView;
+            NodeIdViewHolder(@NonNull View itemView, Typeface font){
+                super(itemView);
+                textView = itemView.findViewById(android.R.id.text1);
+                textView.setTypeface(font);
+                textView.setTextColor(PET_BLUE);
+                textView.setTextSize(18f);
+                textView.setBackgroundColor(android.graphics.Color.TRANSPARENT);
+            }
+
+            void bind(DiscoveredDevice device){
+                textView.setText(device.getNodeID());
+            }
+        }
     }
 }
