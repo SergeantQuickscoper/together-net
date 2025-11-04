@@ -1,12 +1,16 @@
 package com.example.togethernet.network;
 
-public class DiscoveredDevice{
-    private String mac;
-    private String nodeID;
+import android.bluetooth.BluetoothDevice;
 
-    DiscoveredDevice(String mac_, String nodeID_){
+public class DiscoveredDevice{
+    private final String mac;
+    private final String nodeID;
+    private final BluetoothDevice gattConnectionObj;
+
+    DiscoveredDevice(String mac_, String nodeID_, BluetoothDevice gattConnectionObj_){
         mac = mac_;
         nodeID = nodeID_;
+        gattConnectionObj = gattConnectionObj_;
     }
     public String getMac() {
         return mac;
@@ -14,5 +18,9 @@ public class DiscoveredDevice{
 
     public String getNodeID() {
         return nodeID;
+    }
+
+    public BluetoothDevice getGattConnectionObj() {
+        return gattConnectionObj;
     }
 }

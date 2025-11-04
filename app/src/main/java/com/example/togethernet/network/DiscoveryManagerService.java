@@ -25,16 +25,13 @@ import android.os.ParcelUuid;
 import android.util.Log;
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
-
-import org.w3c.dom.Node;
-
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.UUID;
 import java.util.HashSet;
 
 
-// MAJOR TODO: actually add a check to see if bluetooth is on on the device (probably in the try block)
+// MAJOR TODO: actually add a check to see if bluetooth is on on the device AND LOC TOO (probably in the try block)
 public class DiscoveryManagerService extends Service {
     // channel settings
     private static final String TAG = "BLEService";
@@ -53,6 +50,11 @@ public class DiscoveryManagerService extends Service {
     // network stats (GOING STATIC VARS for now, in the future look into Binding/Broadcasting)
     public static int totalDiscoveredNodes = 0;
     public static final HashSet<DiscoveredDevice> discoveredDevices = new HashSet<>();
+
+    // figure out a way to use these in activities (static causes memory leak apparently)
+    public  GattServerManager gattServerManager;
+    public  GattClientManager gattClientManager;
+
     private final Runnable scanPulse = new Runnable(){
         @Override
         public void run(){
@@ -81,6 +83,32 @@ public class DiscoveryManagerService extends Service {
             Log.e(TAG, "Bluetooth not available or not enabled");
             stopSelf();
         }
+
+        gattServerManager = new GattServerManager(this);
+
+        gattServerManager.setMessageListener((fromMac, message) -> {
+            Log.i(TAG, "App received message: " + message);
+            // TODO: forward to ui/router (if im making one lol)
+        });
+
+        gattServerManager.startServer();
+
+
+        gattClientManager = new GattClientManager(this);
+
+        gattClientManager.setOnConnectListener((mac) -> {
+            Log.i(TAG, "Client connected to " + mac);
+        });
+
+        gattClientManager.setOnDisconnectListener((mac) -> {
+            Log.i(TAG, "Client disconnected from:" + mac);
+        });
+
+        gattClientManager.setMessageListener((from, msg) -> {
+            Log.i(TAG, "Received from server: " + msg);
+            // TODO: forward to mesh manager whenever i make it
+        });
+
     }
 
     private void makeForeground(){
@@ -101,7 +129,7 @@ public class DiscoveryManagerService extends Service {
         AdvertiseSettings settings = new AdvertiseSettings.Builder()
                 .setAdvertiseMode(AdvertiseSettings.ADVERTISE_MODE_BALANCED)
                 .setTxPowerLevel(AdvertiseSettings.ADVERTISE_TX_POWER_MEDIUM)
-                .setConnectable(false)
+                .setConnectable(true)
                 .build();
 
         NodeDAO dao = new NodeDAO(this);
@@ -178,7 +206,7 @@ public class DiscoveryManagerService extends Service {
             String nodeId = new String(serviceData, StandardCharsets.UTF_8);
 
             if (!containsMac(mac)){
-                discoveredDevices.add(new DiscoveredDevice(mac, nodeId));
+                discoveredDevices.add(new DiscoveredDevice(mac, nodeId, result.getDevice()));
                 totalDiscoveredNodes = discoveredDevices.size();
                 Log.i(TAG, "New device discovered: " + nodeId);
             }
@@ -196,7 +224,7 @@ public class DiscoveryManagerService extends Service {
             Log.d(TAG, "No perms to scan or advertise");
             return;
         }
-
+        if(gattServerManager != null) gattServerManager.stopServer();
 
         Log.i(TAG, "BLEService stopped");
     }
@@ -227,8 +255,9 @@ public class DiscoveryManagerService extends Service {
         try{
             scanner.stopScan(scanCallback);
         }
-        catch(Exception e){
+        catch(SecurityException e){
             // lol
+            return;
         }
         isScanning = false;
         scanHandler.postDelayed(scanPulse, SCAN_PAUSE_MS);
