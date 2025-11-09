@@ -20,7 +20,7 @@ public class DiscoveredDevice{
         return nodeID;
     }
 
-    public BluetoothDevice getGattConnectionObj() {
+    public BluetoothDevice getGattConnectionObj(){
         return gattConnectionObj;
     }
 }
