@@ -34,6 +34,15 @@ public class SearchNodesActivity extends AppCompatActivity {
         allDevices = new ArrayList<>(DiscoveryManagerService.discoveredDevices);
         adapter = new NodeIdAdapter(allDevices);
         recyclerView.setAdapter(adapter);
+        adapter.setOnItemClickListener(new NodeIdAdapter.OnItemClickListener(){
+            @Override
+            public void onItemClick(DiscoveredDevice device) {
+                android.content.Intent intent = new android.content.Intent(SearchNodesActivity.this, ChatActivity.class);
+                intent.putExtra("node_mac", device.getMac());
+                intent.putExtra("node_id", device.getNodeID());
+                startActivity(intent);
+            }
+        });
 
         searchBox = findViewById(R.id.searchBox);
         searchBox.addTextChangedListener(new TextWatcher(){
@@ -69,6 +78,9 @@ public class SearchNodesActivity extends AppCompatActivity {
         private List<DiscoveredDevice> devices;
         private Typeface petFont;
         private static final int PET_BLUE = 0xFF2C1DFF; // my blue
+        private OnItemClickListener listener;
+        public interface OnItemClickListener { void onItemClick(DiscoveredDevice device); }
+        public void setOnItemClickListener(OnItemClickListener l) { this.listener = l; }
 
         NodeIdAdapter(List<DiscoveredDevice> devices){
             this.devices = devices;
@@ -90,6 +102,9 @@ public class SearchNodesActivity extends AppCompatActivity {
         @Override
         public void onBindViewHolder(@NonNull NodeIdViewHolder holder, int position){
             holder.bind(devices.get(position));
+            holder.itemView.setOnClickListener(v -> {
+                if (listener != null) listener.onItemClick(devices.get(position));
+            });
         }
         @Override
         public int getItemCount(){

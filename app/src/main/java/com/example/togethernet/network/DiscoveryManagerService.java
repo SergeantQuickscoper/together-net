@@ -52,8 +52,8 @@ public class DiscoveryManagerService extends Service {
     public static final HashSet<DiscoveredDevice> discoveredDevices = new HashSet<>();
 
     // figure out a way to use these in activities (static causes memory leak apparently)
-    public  GattServerManager gattServerManager;
-    public  GattClientManager gattClientManager;
+    private GattServerManager gattServerManager;
+    private GattClientManager gattClientManager;
 
     private final Runnable scanPulse = new Runnable(){
         @Override
@@ -66,6 +66,13 @@ public class DiscoveryManagerService extends Service {
             }
         }
     };
+
+    public class LocalBinder extends android.os.Binder {
+        public DiscoveryManagerService getService() {
+            return DiscoveryManagerService.this;
+        }
+    }
+    private final IBinder binder = new LocalBinder();
 
     @Override
     public void onCreate(){
@@ -85,30 +92,7 @@ public class DiscoveryManagerService extends Service {
         }
 
         gattServerManager = new GattServerManager(this);
-
-        gattServerManager.setMessageListener((fromMac, message) -> {
-            Log.i(TAG, "App received message: " + message);
-            // TODO: forward to ui/router (if im making one lol)
-        });
-
-        gattServerManager.startServer();
-
-
-        gattClientManager = new GattClientManager(this);
-
-        gattClientManager.setOnConnectListener((mac) -> {
-            Log.i(TAG, "Client connected to " + mac);
-        });
-
-        gattClientManager.setOnDisconnectListener((mac) -> {
-            Log.i(TAG, "Client disconnected from:" + mac);
-        });
-
-        gattClientManager.setMessageListener((from, msg) -> {
-            Log.i(TAG, "Received from server: " + msg);
-            // TODO: forward to mesh manager whenever i make it
-        });
-
+        MessageManager.initialize(this, gattClientManager, gattServerManager);
     }
 
     private void makeForeground(){
@@ -231,10 +215,12 @@ public class DiscoveryManagerService extends Service {
 
     @Nullable
     @Override
-    public IBinder onBind(Intent intent){
-        // not used ignore
-        return null;
+    public IBinder onBind(Intent intent) {
+        return binder;
     }
+
+    public GattClientManager getGattClientManager() { return gattClientManager; }
+    public GattServerManager getGattServerManager() { return gattServerManager; }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
