@@ -2,6 +2,7 @@ package com.example.togethernet.network;
 
 import android.bluetooth.*;
 import android.content.Context;
+import android.graphics.Typeface;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -16,7 +17,6 @@ public class GattClientManager {
 
     private BluetoothGatt bluetoothGatt;
     private BluetoothGattCharacteristic messageCharacteristic;
-
     private static final UUID CHAT_SERVICE_UUID = UUID.fromString("0000ABC0-0000-1000-8000-00805F9B34FB");
     private static final UUID CHAT_MESSAGE_UUID = UUID.fromString("0000ABC1-0000-1000-8000-00805F9B34FB");
 
@@ -90,10 +90,12 @@ public class GattClientManager {
             Log.e(TAG, "Failed send message, GATT not ready");
             return;
         }
+        // Use WRITE_TYPE_DEFAULT to support up to 512 bytes (instead of 20 bytes with WRITE_TYPE_NO_RESPONSE)
+        messageCharacteristic.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT);
         messageCharacteristic.setValue(msg.getBytes(StandardCharsets.UTF_8));
         try{
             boolean success = bluetoothGatt.writeCharacteristic(messageCharacteristic);
-            Log.i(TAG, "Sent frm client:" + msg + " (success=" + success + ")");
+            Log.i(TAG, "Sent frm client:" + msg + " (success=" + success + ", length=" + msg.length() + " bytes)");
         }
         catch(SecurityException e){
             Log.e(TAG, "failed to send message from client cuz perms " + e);
@@ -122,6 +124,8 @@ public class GattClientManager {
 
     }
 
+    private int currentMtu = 23; //default
+
     private final BluetoothGattCallback gattClientCallback = new BluetoothGattCallback(){
 
         @Override
@@ -131,6 +135,11 @@ public class GattClientManager {
                 if(newState == BluetoothProfile.STATE_CONNECTED){
                     Log.i(TAG, "Connected to GATT server: " + mac);
                     if(onConnectListener != null) onConnectListener.onConnected(mac);
+
+                    // Request larger MTU immediately after connecting
+                    boolean mtuResult = bluetoothGatt.requestMtu(512);
+                    Log.i(TAG, "Requested MTU 512, result=" + mtuResult);
+
                     gatt.discoverServices();
                 }
                 else if(newState == BluetoothProfile.STATE_DISCONNECTED){
@@ -143,7 +152,12 @@ public class GattClientManager {
                 Log.e(TAG, "failed to connect to server cuz perms " + e);
                 return;
             }
+        }
 
+        @Override
+        public void onMtuChanged(@NonNull BluetoothGatt gatt, int mtu, int status) {
+            Log.i(TAG, "MTU changed to: " + mtu + " status: " + status);
+            currentMtu = mtu; // Save the currently negotiated MTU size
         }
 
         @Override

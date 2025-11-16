@@ -92,6 +92,30 @@ public class DiscoveryManagerService extends Service {
         }
 
         gattServerManager = new GattServerManager(this);
+
+        gattServerManager.setMessageListener((fromMac, message) -> {
+            Log.i(TAG, "App received message: " + message);
+            // TODO: forward to ui/router (if im making one lol)
+        });
+
+        gattServerManager.startServer();
+
+
+        gattClientManager = new GattClientManager(this);
+
+        gattClientManager.setOnConnectListener((mac) -> {
+            Log.i(TAG, "Client connected to " + mac);
+        });
+
+        gattClientManager.setOnDisconnectListener((mac) -> {
+            Log.i(TAG, "Client disconnected from:" + mac);
+        });
+
+        gattClientManager.setMessageListener((from, msg) -> {
+            Log.i(TAG, "Received from server: " + msg);
+            // TODO: forward to mesh manager whenever i make it
+        });
+
         MessageManager.initialize(this, gattClientManager, gattServerManager);
     }
 
